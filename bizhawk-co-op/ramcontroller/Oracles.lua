@@ -1,8 +1,8 @@
 local addrs = nil
 local seasons_addrs = {
-	wNetCountIn = 0xc69c,
-	wNetTreasureIn = 0xc69e,
-	wNetTreasureOut = 0xc6a0,
+	wNetCountIn = 0xc6a1,
+	wNetTreasureIn = 0xcbfc,
+	wNetTreasureOut = 0xcbfe,
 }
 local ages_addrs = {
 }
