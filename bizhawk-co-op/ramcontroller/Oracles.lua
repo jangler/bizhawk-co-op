@@ -16,14 +16,6 @@ local function string_from_byterange(br)
 	return string.char(unpack(t))
 end
 
--- returns relevant variables for sync. only works if player is in-game!
-local function get_ram()
-	return {
-		hp = memory.readbyte(addrs.wLinkHealth),
-		max_hp = memory.readbyte(addrs.wLinkMaxHealth),
-	}
-end
-
 -- figure out whether we're playing seasons or ages (or neither)
 local game_code = string_from_byterange(memory.readbyterange(0x134, 9))
 if game_code == "ZELDA DIN" then
