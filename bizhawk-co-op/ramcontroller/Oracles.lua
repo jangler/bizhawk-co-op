@@ -55,11 +55,11 @@ function oracles_ram.getMessage()
 	-- buffered treasure out? send and clear it
 	local out_id = memory.readbyte(addrs.wNetTreasureOut) 
 	if out_id ~= 0 then
-		local out_subid = memory.readbyte(addrs.wNetTreasureOut + 1)
-		message["m"] = {out_id, out_subid}
+		local out_param = memory.readbyte(addrs.wNetTreasureOut + 1)
+		message["m"] = {out_id, out_param}
 		memory.writebyte(addrs.wNetTreasureOut, 0)
 		memory.writebyte(addrs.wNetTreasureOut + 1, 0)
-		console.log(string.format("sent item: {%02x, %02x}", out_id, out_subid))
+		console.log(string.format("sent item: {%02x, %02x}", out_id, out_param))
 	end
 
 	-- return the message if it has content
