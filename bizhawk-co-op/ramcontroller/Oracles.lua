@@ -83,6 +83,6 @@ function oracles_ram.processMessage(their_user, message)
 	end
 end
 
-oracles_ram.itemcount = 0
+oracles_ram.itemcount = 1
 
 return oracles_ram
