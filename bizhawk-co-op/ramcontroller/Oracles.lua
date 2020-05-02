@@ -75,6 +75,6 @@ function oracles_ram.processMessage(their_user, message)
 	end
 end
 
-oracles_ram.itemcount = 1
+oracles_ram.itemcount = 1 -- dummy value, must be a positive integer
 
 return oracles_ram
