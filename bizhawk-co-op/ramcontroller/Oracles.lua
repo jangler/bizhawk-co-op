@@ -1,7 +1,10 @@
 local addrs = nil
 local seasons_addrs = {
+	multiPlayerNumber = 0x3f25,
+	wGameState = 0xc2ee,
 	wNetCountIn = 0xc6a1,
-	wNetTreasureIn = 0xcbfc,
+	wNetTreasureIn = 0xcbfb,
+	wNetPlayerOut = 0xcbfd,
 	wNetTreasureOut = 0xcbfe,
 }
 local ages_addrs = {
@@ -26,40 +29,38 @@ else
 	error("unknown ROM")
 end
 
+local this_player = memory.readbyte(addrs.multiPlayerNumber)
 local items_in = {}
 local oracles_ram = {} -- exports RAM controller interface
-
--- debug text in case items_in starts with stuff
-for _, v in ipairs(items_in) do
-	console.log(string.format("starting item: {%02x, %02x}", v[1], v[2]))
-end
 
 -- Gets a message to send to the other player of new changes
 -- Returns the message as a dictionary object
 -- Returns false if no message is to be sent
 function oracles_ram.getMessage()
 	-- return false if the player isn't in-game
-	local wGameState = memory.readbyte(0xc2ee)
-	if wGameState ~= 2 then return false end
+	if memory.readbyte(addrs.wGameState) ~= 2 then return false end
 
 	-- give the most recent item to the game every frame until counts match
 	local count_in = memory.readbyte(addrs.wNetCountIn)
 	if #items_in > count_in then
 		local item = items_in[count_in + 1]
-		memory.writebyte(addrs.wNetTreasureIn, item[1])
-		memory.writebyte(addrs.wNetTreasureIn + 1, item[2])
+		memory.writebyte(addrs.wNetTreasureIn, item[2])
+		memory.writebyte(addrs.wNetTreasureIn + 1, item[3])
 	end
 
 	local message = {}
 
 	-- buffered treasure out? send and clear it
-	local out_id = memory.readbyte(addrs.wNetTreasureOut) 
-	if out_id ~= 0 then
+	local out_player = memory.readbyte(addrs.wNetPlayerOut)
+	if out_player ~= 0 then
+		local out_id = memory.readbyte(addrs.wNetTreasureOut)
 		local out_param = memory.readbyte(addrs.wNetTreasureOut + 1)
-		message["m"] = {out_id, out_param}
+		message["m"] = {out_player, out_id, out_param}
+		memory.writebyte(addrs.wNetPlayerOut, 0)
 		memory.writebyte(addrs.wNetTreasureOut, 0)
 		memory.writebyte(addrs.wNetTreasureOut + 1, 0)
-		console.log(string.format("sent item: {%02x, %02x}", out_id, out_param))
+		console.log(string.format("sent item to P%d: {%02x, %02x}",
+			out_player, out_id, out_param))
 	end
 
 	-- return the message if it has content
@@ -70,8 +71,11 @@ end
 -- Process a message from another player and update RAM
 function oracles_ram.processMessage(their_user, message)
 	if message["m"] ~= nil then
-		table.insert(items_in, message["m"])
-		console.log(string.format("received item: {%02x, %02x}", message["m"][1], message["m"][2]))
+		if message["m"][1] == this_player then
+			table.insert(items_in, message["m"])
+			console.log(string.format("received item from P%d: {%02x, %02x}",
+				message["m"][1], message["m"][2], message["m"][3]))
+		end
 	end
 end
 
