@@ -43,12 +43,20 @@ function oracles_ram.getMessage()
 	-- return false if the player isn't in-game
 	if memory.readbyte(addrs.wGameState) ~= 2 then return false end
 
-	-- give the most recent item to the game every frame until counts match
 	local count_in = memory.readbyte(addrs.wNetCountIn)
 	if #items_in > count_in then
+		-- give the most recent item to the game every frame until
+		-- counts match
 		local item = items_in[count_in + 1]
 		memory.writebyte(addrs.wNetTreasureIn, item[2])
 		memory.writebyte(addrs.wNetTreasureIn + 1, item[3])
+	elseif #items_in < count_in then
+		-- something is wrong if the save file's item count is higher
+		-- than the RAM controller's, likely a disconnect. reset it so
+		-- that the player can resync. TODO: items sent while a player
+		-- is not connected will currently be lost forever
+		console.log("resetting item count")
+		memory.writebyte(addrs.wNetCountIn, #items_in)
 	end
 
 	local message = {}
