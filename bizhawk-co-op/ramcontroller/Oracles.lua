@@ -94,8 +94,8 @@ function oracles_ram.processMessage(their_user, message)
 	if message["m"] ~= nil then
 		if message["m"][1] == this_player then
 			table.insert(items_in, message["m"])
-			console.log(string.format("received item from P%d: {%02x, %02x}",
-				message["m"][1], message["m"][2], message["m"][3]))
+			console.log(string.format("received item: {%02x, %02x}",
+				message["m"][2], message["m"][3]))
 		end
 	end
 end
