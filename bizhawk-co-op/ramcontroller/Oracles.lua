@@ -10,6 +10,14 @@ local seasons_addrs = {
 	wActiveRoom = 0xcc4c,
 }
 local ages_addrs = {
+	multiPlayerNumber = 0x3f1b,
+	wGameState = 0xc2ee,
+	wNetCountIn = 0xc6a9,
+	wNetTreasureIn = 0xcbfb,
+	wNetPlayerOut = 0xcbfd,
+	wNetTreasureOut = 0xcbfe,
+	wActiveGroup = 0xcc2d,
+	wActiveRoom = 0xcc30,
 }
 
 -- converts a return value from memory.readbyterange to a string
