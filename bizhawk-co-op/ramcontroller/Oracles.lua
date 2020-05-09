@@ -8,6 +8,7 @@ local seasons_addrs = {
 	wNetTreasureOut = 0xcbfe,
 	wActiveGroup = 0xcc49,
 	wActiveRoom = 0xcc4c,
+	wLinkGrabState = 0xcc75,
 }
 local ages_addrs = {
 	multiPlayerNumber = 0x3f1b,
@@ -18,6 +19,7 @@ local ages_addrs = {
 	wNetTreasureOut = 0xcbfe,
 	wActiveGroup = 0xcc2d,
 	wActiveRoom = 0xcc30,
+	wLinkGrabState = 0xcc5a,
 }
 
 -- converts a return value from memory.readbyterange to a string
@@ -48,8 +50,11 @@ local oracles_ram = {} -- exports RAM controller interface
 -- Returns the message as a dictionary object
 -- Returns false if no message is to be sent
 function oracles_ram.getMessage()
-	-- return false if the player isn't in-game
-	if memory.readbyte(addrs.wGameState) ~= 2 then return false end
+	-- return false if the player isn't in-game, or link is holding something
+	if memory.readbyte(addrs.wGameState) ~= 2 or
+		memory.readbyte(addrs.wLinkGrabState) ~= 0 then
+		return false
+	end
 
 	local count_in = memory.readbyte(addrs.wNetCountIn)
 	if #items_in > count_in then
